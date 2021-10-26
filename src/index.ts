@@ -1,6 +1,5 @@
 import { Express } from "express";
-import { json } from "stream/consumers";
-import { getData } from "./db/db";
+import { getData, getAllMatchedData } from "./db/db";
 
 const port = 3500;
 const express = require("express");
@@ -27,6 +26,37 @@ function organizeData(data: any[], limit: number, offset: number) {
     }
   }
 }
+
+app.get("/api/branches", async (req, res) => {
+  const text: string | undefined = req.query.q?.toString();
+  const limit: string | undefined = req.query.limit?.toString();
+  const offset: string | undefined = req.query.offset?.toString();
+
+  // handling query error
+  if (!text) {
+    res.status(400).send(`invalid query parameter`);
+    return;
+  } else if (limit !== undefined && !parseInt(limit) && parseInt(limit) < 0) {
+    res.status(400).send(`invalid limit parameter`);
+    return;
+  } else if (
+    offset !== undefined &&
+    !parseInt(offset) &&
+    parseInt(offset) < 0
+  ) {
+    res.status(400).send(`invalid offset parameter`);
+    return;
+  }
+
+  await getAllMatchedData(text).then((data) => {
+    const result = organizeData(
+      data,
+      limit === undefined ? 0 : parseInt(limit),
+      offset === undefined ? 0 : parseInt(offset)
+    );
+    res.send(JSON.stringify(result));
+  });
+});
 
 app.get("/api/branches/autocomplete", async (req, res) => {
   const text: string | undefined = req.query.q?.toString();

@@ -35,6 +35,49 @@ export function getData(branchName: string) {
   const results = db("branches")
     .select("*")
     .where("branch", "like", `%${branchName}%`);
-  //   console.log(results);
+  // .offset(10)
+  // .limit(20);
   return results;
+}
+
+export async function getAllMatchedData(text: string) {
+  const branchRes = await db("branches")
+    .select("*")
+    .where({ branch: text })
+    .then((res) => res);
+  const addressRes = await db("branches")
+    .select("*")
+    .where({ branch: text })
+    .then((res) => res);
+  const cityRes = await db("branches")
+    .select("*")
+    .where({ city: text })
+    .then((res) => res);
+  const districtRes = await db("branches")
+    .select("*")
+    .where({ district: text })
+    .then((res) => res);
+  const stateRes = await db("branches")
+    .select("*")
+    .where({ state: text })
+    .then((res) => res);
+
+  const results = [
+    ...branchRes,
+    ...addressRes,
+    ...cityRes,
+    ...districtRes,
+    ...stateRes,
+  ];
+
+  const filteredResults: any = [];
+  const tempArray: any = [];
+  results.forEach((data) => {
+    if (!tempArray.includes(data.bank_id)) {
+      tempArray.push(data.bank_id);
+      filteredResults.push(data);
+    }
+  });
+
+  return filteredResults;
 }
