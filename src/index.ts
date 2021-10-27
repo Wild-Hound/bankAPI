@@ -28,7 +28,7 @@ function organizeData(data: any[], limit: number, offset: number) {
 }
 
 app.get("/api/branches", async (req, res) => {
-  const text: string | undefined = req.query.q?.toString();
+  const text: string | undefined = req.query.q?.toString().toUpperCase();
   const limit: string | undefined = req.query.limit?.toString();
   const offset: string | undefined = req.query.offset?.toString();
 
